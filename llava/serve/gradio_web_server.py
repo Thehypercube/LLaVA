@@ -286,16 +286,25 @@ def http_bot(state, model_selector, temperature, top_p, max_new_tokens, request:
         fout.write(json.dumps(data) + "\n")
 
 title_markdown = ("""
-# 🌋 LLaVA: Large Language and Vision Assistant
-[[Project Page](https://llava-vl.github.io)] [[Code](https://github.com/haotian-liu/LLaVA)] [[Model](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md)] | 📚 [[LLaVA](https://arxiv.org/abs/2304.08485)] [[LLaVA-v1.5](https://arxiv.org/abs/2310.03744)] [[LLaVA-v1.6](https://llava-vl.github.io/blog/2024-01-30-llava-1-6/)]
+# 🚀 智能视觉助手 - LLaVA
+### 🌟 体验最先进的多模态AI技术
+
+> 📷 **图像理解** | 💬 **智能对话** | 🧠 **深度分析**
+
+[[项目主页](https://llava-vl.github.io)] [[源代码](https://github.com/haotian-liu/LLaVA)] [[模型库](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md)] | 📚 [[LLaVA论文](https://arxiv.org/abs/2304.08485)] [[LLaVA-v1.5](https://arxiv.org/abs/2310.03744)] [[LLaVA-v1.6](https://llava-vl.github.io/blog/2024-01-30-llava-1-6/)]
+
+---
 """)
 
 tos_markdown = ("""
-### Terms of use
-By using this service, users are required to agree to the following terms:
-The service is a research preview intended for non-commercial use only. It only provides limited safety measures and may generate offensive content. It must not be used for any illegal, harmful, violent, racist, or sexual purposes. The service may collect user dialogue data for future research.
-Please click the "Flag" button if you get any inappropriate answer! We will collect those to keep improving our moderator.
-For an optimal experience, please use desktop computers for this demo, as mobile devices may compromise its quality.
+### 📋 使用须知
+- 🔬 **研究预览版**: 本服务仅供非商业用途的研究和学习使用
+- ⚠️ **内容提醒**: AI可能生成不准确或不当内容，请谨慎使用
+- 🚫 **禁止用途**: 不得用于非法、有害、暴力、种族主义或色情目的
+- 📱 **最佳体验**: 建议使用桌面设备以获得最佳体验效果
+- 🛡️ **反馈机制**: 如遇不当回复请点击"举报"按钮，帮助我们改进服务
+
+💡 **提示**: 上传图片后，您可以询问图片内容、分析场景或寻求建议！
 """)
 
 
@@ -308,13 +317,98 @@ block_css = """
 
 #buttons button {
     min-width: min(120px,100%);
+    border-radius: 10px;
+    margin: 2px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#buttons button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.gradio-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+#chatbot {
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+}
+
+#model_selector_row {
+    background: rgba(255,255,255,0.9);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.input-container {
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+/* 标题样式 */
+.gradio-container h1 {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 1em;
+}
+
+/* 输入框样式 */
+.gradio-textbox {
+    border-radius: 25px !important;
+    border: 2px solid #ddd !important;
+    transition: all 0.3s ease !important;
+}
+
+.gradio-textbox:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* 图片上传区域 */
+.gradio-image {
+    border-radius: 15px;
+    border: 2px dashed #ddd;
+    transition: all 0.3s ease;
+}
+
+.gradio-image:hover {
+    border-color: #667eea;
+    background-color: rgba(102, 126, 234, 0.05);
+}
+
+/* 参数面板 */
+.gradio-accordion {
+    border-radius: 10px;
+    background: rgba(255,255,255,0.9);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .gradio-container h1 {
+        font-size: 1.8em;
+    }
+    
+    #buttons button {
+        min-width: 80px;
+        font-size: 0.9em;
+    }
 }
 
 """
 
 def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
-    textbox = gr.Textbox(show_label=False, placeholder="Enter text and press ENTER", container=False)
-    with gr.Blocks(title="LLaVA", theme=gr.themes.Default(), css=block_css) as demo:
+    textbox = gr.Textbox(show_label=False, placeholder="✨ 请输入您的问题，支持上传图片进行分析...", container=False)
+    with gr.Blocks(title="LLaVA 智能助手", theme=gr.themes.Default(), css=block_css) as demo:
         state = gr.State()
 
         if not embed_mode:
@@ -351,7 +445,7 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
             with gr.Column(scale=8):
                 chatbot = gr.Chatbot(
                     elem_id="chatbot",
-                    label="LLaVA Chatbot",
+                    label="🤖 AI助手对话",
                     height=650,
                     layout="panel",
                 )
@@ -359,14 +453,14 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                     with gr.Column(scale=8):
                         textbox.render()
                     with gr.Column(scale=1, min_width=50):
-                        submit_btn = gr.Button(value="Send", variant="primary")
+                        submit_btn = gr.Button(value="🚀 发送", variant="primary")
                 with gr.Row(elem_id="buttons") as button_row:
-                    upvote_btn = gr.Button(value="👍  Upvote", interactive=False)
-                    downvote_btn = gr.Button(value="👎  Downvote", interactive=False)
-                    flag_btn = gr.Button(value="⚠️  Flag", interactive=False)
+                    upvote_btn = gr.Button(value="👍 很棒", interactive=False, variant="secondary")
+                    downvote_btn = gr.Button(value="👎 不好", interactive=False, variant="secondary")
+                    flag_btn = gr.Button(value="🚩 举报", interactive=False, variant="secondary")
                     #stop_btn = gr.Button(value="⏹️  Stop Generation", interactive=False)
-                    regenerate_btn = gr.Button(value="🔄  Regenerate", interactive=False)
-                    clear_btn = gr.Button(value="🗑️  Clear", interactive=False)
+                    regenerate_btn = gr.Button(value="🔄 重新生成", interactive=False, variant="secondary")
+                    clear_btn = gr.Button(value="🗑️ 清空对话", interactive=False, variant="secondary")
 
         if not embed_mode:
             gr.Markdown(tos_markdown)
