@@ -328,6 +328,25 @@ block_css = """
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+/* 示例：简洁白色主题 (注释掉以下代码来使用)
+.gradio-container {
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+#chatbot {
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    background: #ffffff;
+}
+
+#buttons button {
+    border-radius: 6px;
+    margin: 4px 2px;
+    font-weight: 400;
+}
+*/
+
 .gradio-container {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
